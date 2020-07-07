@@ -1,11 +1,14 @@
 package proPets.accounting.service;
 
+import java.util.concurrent.ExecutionException;
+
 import org.springframework.http.ResponseEntity;
 
 import proPets.accounting.dto.NewUserDto;
 import proPets.accounting.dto.UserEditDto;
 import proPets.accounting.dto.UserProfileDto;
 import proPets.accounting.dto.UserStatesDto;
+import proPets.accounting.exceptions.UserNotFoundException;
 
 public interface UserAccountService {
 	
@@ -15,7 +18,7 @@ public interface UserAccountService {
 	
 	UserStatesDto findUser (String email) throws Exception;
 	
-	UserStatesDto removeUser(String email);
+	UserStatesDto removeUser(String email) throws InterruptedException, ExecutionException, UserNotFoundException, Exception;
 	
 	UserStatesDto editUser(UserEditDto userEditDto, String email);
 	

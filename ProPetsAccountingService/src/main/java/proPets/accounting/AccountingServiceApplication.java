@@ -5,15 +5,31 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+import org.springframework.core.task.TaskExecutor;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import proPets.accounting.dao.UserAccountRepository;
 import proPets.accounting.model.UserAccount;
 
 @SpringBootApplication
+@EnableAsync
 public class AccountingServiceApplication implements CommandLineRunner {
 	
 	@Autowired
 	UserAccountRepository userAccountRepository;
+	
+	@Bean(name="processExecutor")
+    public TaskExecutor workExecutor() {
+        ThreadPoolTaskExecutor threadPoolTaskExecutor = new ThreadPoolTaskExecutor();
+        threadPoolTaskExecutor.setThreadNamePrefix("Async-");
+        threadPoolTaskExecutor.setCorePoolSize(3);
+        threadPoolTaskExecutor.setMaxPoolSize(3);
+        threadPoolTaskExecutor.setQueueCapacity(600);
+        threadPoolTaskExecutor.afterPropertiesSet();
+        return threadPoolTaskExecutor;
+    }
 
 	public static void main(String[] args) {
 		SpringApplication.run(AccountingServiceApplication.class, args);

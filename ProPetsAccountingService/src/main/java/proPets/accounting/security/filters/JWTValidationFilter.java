@@ -19,8 +19,8 @@ import org.springframework.stereotype.Component;
 import proPets.accounting.dao.UserAccountRepository;
 import proPets.accounting.service.JwtService;
 
-@Component
-@Order(30)
+//@Component
+//@Order(30)
 
 public class JWTValidationFilter implements Filter {
 
@@ -37,8 +37,9 @@ public class JWTValidationFilter implements Filter {
 		HttpServletResponse response = (HttpServletResponse) resp;
 		String path = request.getServletPath();
 		String auth = request.getHeader("Authorization");
+		String method = request.getMethod();
 
-		if (path.startsWith("/account/v1/user")) {
+		if (!checkPointCut(path, method) && path.startsWith("/account/v1/user")) {
 			if (auth.startsWith("Bearer")) {
 				String newToken;
 				try {
@@ -79,6 +80,12 @@ public class JWTValidationFilter implements Filter {
 			};
 		}
 	}
+	
+	private boolean checkPointCut(String path, String method) {
+		boolean check = "/acount/v1/user".equalsIgnoreCase(path) && "Delete".equalsIgnoreCase(method);
+		return check;
+	}
+	
 // later - make it depends on the role admin
 //	private boolean checkPointCut(String path, String method) {
 //		boolean check = "/actuator/refresh".equalsIgnoreCase(path) && "Post".equalsIgnoreCase(method);

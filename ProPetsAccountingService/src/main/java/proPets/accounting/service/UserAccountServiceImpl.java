@@ -1,23 +1,35 @@
 package proPets.accounting.service;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.RequestEntity;
+import org.springframework.http.RequestEntity.BodyBuilder;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
+import proPets.accounting.configuration.JWTConfiguration;
 import proPets.accounting.dao.UserAccountRepository;
 import proPets.accounting.dto.NewUserDto;
 import proPets.accounting.dto.UserEditDto;
 import proPets.accounting.dto.UserProfileDto;
+import proPets.accounting.dto.UserRemoveDto;
 import proPets.accounting.dto.UserStatesDto;
 import proPets.accounting.exceptions.ForbiddenException;
 import proPets.accounting.exceptions.UserConflictException;
 import proPets.accounting.exceptions.UserExistsException;
+import proPets.accounting.exceptions.UserNotFoundException;
 import proPets.accounting.exceptions.WrongDataFormatException;
 import proPets.accounting.model.UserAccount;
 
@@ -26,6 +38,9 @@ public class UserAccountServiceImpl implements UserAccountService {
 
 	@Autowired
 	UserAccountRepository accountRepository;
+	
+	@Autowired
+	JWTConfiguration jwtConfiguration;
 	
 	@Autowired
 	JwtService jwtService;
@@ -54,18 +69,6 @@ public class UserAccountServiceImpl implements UserAccountService {
 		return ResponseEntity.ok().headers(responseHeaders).body(userAccountToUserStatesDto(userAccount));
 	}
 
-	private UserStatesDto userAccountToUserStatesDto(UserAccount userAccount) {
-		return UserStatesDto.builder().email(userAccount.getEmail()).name(userAccount.getName())
-				.avatar(userAccount.getAvatar()).phone(userAccount.getPhone()).fb_link(userAccount.getFb_link())
-				.isBlocked(userAccount.getIsBlocked()).roles(userAccount.getRoles())
-				.build();
-	}
-
-	private String convertSetOfRolesToString(Set<String> roles) {
-		String[] userRoles = roles.stream().map((r) -> r.toUpperCase()).toArray(String[]::new);
-		String res = String.join(",", userRoles);
-		return res;
-	}
 
 	@Override
 	public UserStatesDto findUser(String email) throws Exception {
@@ -74,11 +77,44 @@ public class UserAccountServiceImpl implements UserAccountService {
 	}
 
 	@Override
-	public UserStatesDto removeUser(String email) {
-		UserAccount userAccount = accountRepository.findById(email).get();
+	public UserStatesDto removeUser(String email) throws Exception  {
+		System.out.println("1");
+		UserAccount userAccount = accountRepository.findById(email).orElseThrow(()->new UserNotFoundException());
+		System.out.println("2");
+		UserStatesDto res = findUser(email);
+		System.out.println(userAccount.getEmail());
 		accountRepository.deleteById(email);
-		return userAccountToUserStatesDto(userAccount);
+		UserRemoveDto dto = new UserRemoveDto(email);
+		// String url = "https://propets-.../message/v1/post/cleaner";
+		String urlMessaging = "http://localhost:8083/message/v1/post/cleaner";
+		// String url = "https://propets-.../lost/v1/post/cleaner";
+		String urlLostFound = "http://localhost:8081/lost/v1/post/cleaner"; //
+		// String url = "https://propets-.../search/v1/cleaner";
+		String urlSearching = "http://localhost:8085/search/v1/cleaner"; //
+		try {
+			Boolean res1=removeUserDataInExternalService(email, dto, urlMessaging).get();
+			System.out.println(res);
+			removeUserDataInExternalService(email, dto, urlLostFound);
+			removeUserDataInExternalService(email, dto, urlSearching);
+				//return userAccountToUserStatesDto(userAccount);
+			return res;
+		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
+		}
+		return null;
+
+	}		
+	
+	@Async("processExecutor")
+	private CompletableFuture<Boolean> removeUserDataInExternalService(String email, UserRemoveDto userRemoveDto,String url)  {
+		RestTemplate restTemplate = jwtConfiguration.restTemplate();
+		BodyBuilder requestBodyBuilder = RequestEntity.method(HttpMethod.DELETE, URI.create(url));
+		RequestEntity<UserRemoveDto> request = requestBodyBuilder.body(userRemoveDto);
+		ResponseEntity<String> newResponse = restTemplate.exchange(request, String.class);
+		return CompletableFuture.completedFuture(newResponse.getStatusCode() == HttpStatus.OK);
 	}
+	
+
 
 	@Override
 	public UserStatesDto editUser(UserEditDto userEditDto, String email) {
@@ -167,6 +203,25 @@ public class UserAccountServiceImpl implements UserAccountService {
 			accountRepository.save(userToBlockUnblock);
 		} else
 			throw new ForbiddenException();
+	}
+	
+	
+	
+	
+	// UTILS:
+	//__________________________________
+	
+	private UserStatesDto userAccountToUserStatesDto(UserAccount userAccount) {
+		return UserStatesDto.builder().email(userAccount.getEmail()).name(userAccount.getName())
+				.avatar(userAccount.getAvatar()).phone(userAccount.getPhone()).fb_link(userAccount.getFb_link())
+				.isBlocked(userAccount.getIsBlocked()).roles(userAccount.getRoles())
+				.build();
+	}
+
+	private String convertSetOfRolesToString(Set<String> roles) {
+		String[] userRoles = roles.stream().map((r) -> r.toUpperCase()).toArray(String[]::new);
+		String res = String.join(",", userRoles);
+		return res;
 	}
 
 //	@Override

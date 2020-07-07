@@ -24,9 +24,11 @@ public class JWTConfiguration {
 		return new RestTemplate();
 	}
 
+	//test
 	@Value("${jwt.message}")
 	String message;
-
+	
+	//test
 	@RefreshScope
 	public String getMessage() {
 		return message;

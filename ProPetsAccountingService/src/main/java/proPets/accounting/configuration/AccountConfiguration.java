@@ -5,9 +5,10 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import proPets.accounting.model.UserAccount;
 
+// to remove or move the beans from jwt config
 public class AccountConfiguration {
 	
-	Map<String, UserAccount> users = new ConcurrentHashMap<>();
+	Map<String, UserAccount> users = new ConcurrentHashMap<>();	
 	
 	public boolean addUser (String sessionId, UserAccount userAccount) {
 		return users.put(sessionId,  userAccount)==null;

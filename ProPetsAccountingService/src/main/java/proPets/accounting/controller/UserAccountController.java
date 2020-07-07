@@ -1,6 +1,7 @@
 package proPets.accounting.controller;
 
 import java.security.Principal;
+import java.util.concurrent.ExecutionException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
@@ -21,7 +22,9 @@ import proPets.accounting.configuration.JWTConfiguration;
 import proPets.accounting.dto.NewUserDto;
 import proPets.accounting.dto.UserEditDto;
 import proPets.accounting.dto.UserProfileDto;
+import proPets.accounting.dto.UserRemoveDto;
 import proPets.accounting.dto.UserStatesDto;
+import proPets.accounting.exceptions.UserNotFoundException;
 import proPets.accounting.service.UserAccountService;
 
 @CrossOrigin(origins = "http://localhost:3000")
@@ -41,6 +44,7 @@ public class UserAccountController {
 //		return userAccountService.checkName(name);
 //	}
 	
+	//to test Config service
 	@RefreshScope
 	@GetMapping("/jwt")
 	public  BeanConfiguration getRefreshedData() {
@@ -65,9 +69,10 @@ public class UserAccountController {
 	}
 
 	@DeleteMapping("/user")
-	public UserStatesDto removeUser(@RequestHeader(value = "Authorization") String authorization, 
-			Principal principal) {
-		return userAccountService.removeUser(principal.getName());
+//	public UserStatesDto removeUser(@RequestHeader(value = "Authorization") String authorization, 
+//			Principal principal) throws InterruptedException, ExecutionException {
+	public UserStatesDto removeUser(@RequestBody UserRemoveDto userRemoveDto) throws Exception {
+		return userAccountService.removeUser(userRemoveDto.getUserId());
 	}
 
 	@PutMapping("/user")

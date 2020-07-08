@@ -6,9 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.client.RestTemplate;
 
 import proPets.accounting.exceptions.UserAuthenticationException;
 import proPets.accounting.model.UserAccount;
@@ -18,11 +16,6 @@ import proPets.accounting.model.UserAccount;
 public class JWTConfiguration {
 
 	Map<String, UserAccount> authenticatedUsers = new ConcurrentHashMap<>();
-
-	@Bean
-	public RestTemplate restTemplate() {
-		return new RestTemplate();
-	}
 
 	//test
 	@Value("${jwt.message}")

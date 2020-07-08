@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import proPets.accounting.dao.UserAccountRepository;
-import proPets.accounting.service.security.JWTUtil;
+import proPets.accounting.service.utils.JWTUtil;
 
 @Service
 public class JwtServiceImpl implements JwtService {

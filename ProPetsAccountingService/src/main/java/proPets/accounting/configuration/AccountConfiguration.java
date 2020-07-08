@@ -3,12 +3,23 @@ package proPets.accounting.configuration;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.client.RestTemplate;
+
 import proPets.accounting.model.UserAccount;
 
-// to remove or move the beans from jwt config
+@Configuration
+@RefreshScope
 public class AccountConfiguration {
 	
 	Map<String, UserAccount> users = new ConcurrentHashMap<>();	
+	
+	@Bean
+	public RestTemplate restTemplate() {
+		return new RestTemplate();
+	}
 	
 	public boolean addUser (String sessionId, UserAccount userAccount) {
 		return users.put(sessionId,  userAccount)==null;

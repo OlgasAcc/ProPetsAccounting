@@ -1,4 +1,4 @@
-package proPets.accounting.service.security;
+package proPets.accounting.service.utils;
 
 import java.io.Serializable;
 import java.util.Date;

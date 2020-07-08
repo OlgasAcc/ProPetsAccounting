@@ -1,7 +1,6 @@
 package proPets.accounting.controller;
 
 import java.security.Principal;
-import java.util.concurrent.ExecutionException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
@@ -24,7 +23,6 @@ import proPets.accounting.dto.UserEditDto;
 import proPets.accounting.dto.UserProfileDto;
 import proPets.accounting.dto.UserRemoveDto;
 import proPets.accounting.dto.UserStatesDto;
-import proPets.accounting.exceptions.UserNotFoundException;
 import proPets.accounting.service.UserAccountService;
 
 @CrossOrigin(origins = "http://localhost:3000")

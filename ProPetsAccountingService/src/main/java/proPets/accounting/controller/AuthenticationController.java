@@ -13,7 +13,7 @@ import proPets.accounting.exceptions.ForbiddenException;
 import proPets.accounting.service.JwtServiceImpl;
 
 @RestController
-@RequestMapping("/security/v1")
+@RequestMapping("/account/v1")
 
 public class AuthenticationController {
 

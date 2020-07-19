@@ -44,7 +44,7 @@ public class UserAccountController {
 	
 	//to test Config service
 	@RefreshScope
-	@GetMapping("/jwt")
+	@GetMapping("/config")
 	public  BeanConfiguration getRefreshedData() {
 		return new BeanConfiguration(jwtConfiguration.getSecret(),jwtConfiguration.getExpPeriodValue(),jwtConfiguration.getMessage());
 	}

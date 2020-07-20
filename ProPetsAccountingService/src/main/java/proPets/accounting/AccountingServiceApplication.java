@@ -14,7 +14,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import proPets.accounting.dao.UserAccountRepository;
 import proPets.accounting.model.UserAccount;
 
-@EnableDiscoveryClient
+//@EnableDiscoveryClient
 @SpringBootApplication
 @EnableAsync
 public class AccountingServiceApplication implements CommandLineRunner {

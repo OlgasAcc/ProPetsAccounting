@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import proPets.accounting.configuration.AccountConfiguration;
 import proPets.accounting.configuration.BeanConfiguration;
 import proPets.accounting.configuration.JWTConfiguration;
 import proPets.accounting.dto.NewUserDto;
@@ -32,36 +33,43 @@ public class UserAccountController {
 
 	@Autowired
 	UserAccountService userAccountService;
-	
+
 	@Autowired
 	JWTConfiguration jwtConfiguration;
 
-	//optionally: to make user's name unique
+	@Autowired
+	AccountConfiguration accountConfiguration;
+
+	// optionally: to make user's name unique
 //	@GetMapping("/unique_name")
 //	public Boolean checkIfTheNameIsUnique (@RequestBody String name) {
 //		return userAccountService.checkName(name);
 //	}
-	
-	//to test Config service
+
+	// to test Config service
 	@RefreshScope
 	@GetMapping("/config")
-	public  BeanConfiguration getRefreshedData() {
-		return new BeanConfiguration(jwtConfiguration.getSecret(),jwtConfiguration.getExpPeriodValue(),jwtConfiguration.getMessage());
+	public BeanConfiguration getRefreshedData() {
+		return new BeanConfiguration(jwtConfiguration.getSecret(), jwtConfiguration.getExpPeriodValue(),
+				jwtConfiguration.getMessage(), accountConfiguration.getMessagingCleanerUrl(),
+				accountConfiguration.getLostFoundCleanerUrl(), accountConfiguration.getSearchingCleanerUrl());
 	}
-	
+
 	@PostMapping("/sign_up")
 	public ResponseEntity<UserStatesDto> register(@RequestBody NewUserDto newUserDto) throws Exception {
 		return userAccountService.register(newUserDto);
 	}
 
 	@PostMapping("/sign_in")
-	public UserStatesDto login(@RequestHeader(value = "Authorization") String authorization, Principal principal) throws Exception {
+	public UserStatesDto login(@RequestHeader(value = "Authorization") String authorization, Principal principal)
+			throws Exception {
 		UserStatesDto user = userAccountService.findUser(principal.getName());
 		return user;
 	}
-	
+
 	@GetMapping("/user/refresh_page")
-	public UserStatesDto refreshPage(@RequestHeader(value = "Authorization") String authorization, Principal principal) throws Exception {
+	public UserStatesDto refreshPage(@RequestHeader(value = "Authorization") String authorization, Principal principal)
+			throws Exception {
 		UserStatesDto user = userAccountService.findUser(principal.getName());
 		return user;
 	}
@@ -78,7 +86,7 @@ public class UserAccountController {
 			@RequestBody UserEditDto userEditDto, Principal principal) {
 		return userAccountService.editUser(userEditDto, principal.getName());
 	}
-	
+
 	@GetMapping("/user/{other_user_id}")
 	public UserProfileDto getOtherUserInfo(@RequestHeader(value = "Authorization") String authorization,
 			@PathVariable String other_user_id) {
@@ -86,14 +94,14 @@ public class UserAccountController {
 	}
 
 	@PostMapping("/user/role/{id}/{role}")
-	public void addRole(@RequestHeader(value = "Authorization") String authorization,
-			@PathVariable String id, @PathVariable String role, Principal principal) {
+	public void addRole(@RequestHeader(value = "Authorization") String authorization, @PathVariable String id,
+			@PathVariable String role, Principal principal) {
 		userAccountService.addRole(id, role, principal.getName());
 	}
 
 	@DeleteMapping("/user/role/{id}/{role}")
-	public void removeRole(@RequestHeader(value = "Authorization") String authorization,
-			@PathVariable String id, @PathVariable String role, Principal principal) {
+	public void removeRole(@RequestHeader(value = "Authorization") String authorization, @PathVariable String id,
+			@PathVariable String role, Principal principal) {
 		userAccountService.removeRole(id, role, principal.getName());
 	}
 
@@ -101,15 +109,17 @@ public class UserAccountController {
 	public void changePassword(@RequestHeader("X-Password") String newPassword, Principal principal) {
 		userAccountService.changePassword(newPassword, principal.getName());
 	}
-	
+
 	@GetMapping("/user/users")
-	public Iterable<UserStatesDto> getAllUsers(@RequestHeader(value = "Authorization") String authorization, Principal principal) {
+	public Iterable<UserStatesDto> getAllUsers(@RequestHeader(value = "Authorization") String authorization,
+			Principal principal) {
 		return userAccountService.getAllUsers(principal.getName());
 	}
 
 	@PutMapping("/user/{id}")
-	public void blockOrUnblockUser(@RequestHeader(value = "Authorization") String authorization, @PathVariable String id, Principal principal) {
-		userAccountService.blockOrUnblockUser(id,principal.getName());
+	public void blockOrUnblockUser(@RequestHeader(value = "Authorization") String authorization,
+			@PathVariable String id, Principal principal) {
+		userAccountService.blockOrUnblockUser(id, principal.getName());
 	}
-	
+
 }

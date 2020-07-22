@@ -9,6 +9,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import proPets.accounting.configuration.AccountConfiguration;
 import proPets.accounting.configuration.JWTConfiguration;
 import proPets.accounting.dao.UserAccountRepository;
 import proPets.accounting.dto.NewUserDto;
@@ -34,6 +35,9 @@ public class UserAccountServiceImpl implements UserAccountService {
 	JWTConfiguration jwtConfiguration;
 	
 	@Autowired
+	AccountConfiguration accountConfiguration;
+	
+	@Autowired
 	JwtService jwtService;
 	
 	@Autowired
@@ -47,7 +51,7 @@ public class UserAccountServiceImpl implements UserAccountService {
 		String hashPassword = BCrypt.hashpw(newUserDto.getPassword(), BCrypt.gensalt());
 		UserAccount userAccount = UserAccount.builder().email(newUserDto.getEmail()).password(hashPassword)
 				.name(newUserDto.getName())
-				.avatar("https://c7.hotpng.com/preview/918/598/466/paw-logo-clip-art-animal-footprint.jpg")
+				.avatar(accountConfiguration.getDefaultAvatarUrl())
 				.phone("none")
 				.fb_link("none")
 				.isBlocked(false)
@@ -72,16 +76,10 @@ public class UserAccountServiceImpl implements UserAccountService {
 		UserAccount userAccount = accountRepository.findById(email).orElseThrow(()->new UserNotFoundException());
 		accountRepository.deleteById(email);
 		UserRemoveDto dto = new UserRemoveDto(email);
-		// String url = "https://propets-.../message/v1/post/cleaner";
-		String urlMessaging = "http://localhost:8083/message/v1/post/cleaner";
-		// String url = "https://propets-.../lost/v1/post/cleaner";
-		String urlLostFound = "http://localhost:8081/lost/v1/post/cleaner"; //
-		// String url = "https://propets-.../search/v1/cleaner";
-		String urlSearching = "http://localhost:8085/search/v1/cleaner"; //
 
-		accountUtil.removeUserDataInExternalService(email, dto, urlMessaging);
-		accountUtil.removeUserDataInExternalService(email, dto, urlLostFound);
-		accountUtil.removeUserDataInExternalService(email, dto, urlSearching);
+		accountUtil.removeUserDataInExternalService(email, dto, accountConfiguration.getMessagingCleanerUrl());
+		accountUtil.removeUserDataInExternalService(email, dto, accountConfiguration.getLostFoundCleanerUrl());
+		accountUtil.removeUserDataInExternalService(email, dto, accountConfiguration.getSearchingCleanerUrl());
 
 		return accountUtil.userAccountToUserStatesDto(userAccount);
 

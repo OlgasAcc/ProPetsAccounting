@@ -22,8 +22,8 @@ import proPets.accounting.configuration.JWTConfiguration;
 import proPets.accounting.dto.NewUserDto;
 import proPets.accounting.dto.UserEditDto;
 import proPets.accounting.dto.UserProfileDto;
-import proPets.accounting.dto.UserRemoveDto;
 import proPets.accounting.dto.UserStatesDto;
+import proPets.accounting.exceptions.UserNotFoundException;
 import proPets.accounting.service.UserAccountService;
 
 @CrossOrigin(origins = "http://localhost:3000")
@@ -39,12 +39,6 @@ public class UserAccountController {
 
 	@Autowired
 	AccountConfiguration accountConfiguration;
-
-	// optionally: to make user's name unique
-//	@GetMapping("/unique_name")
-//	public Boolean checkIfTheNameIsUnique (@RequestBody String name) {
-//		return userAccountService.checkName(name);
-//	}
 
 	// to test Config service
 	@RefreshScope
@@ -75,10 +69,9 @@ public class UserAccountController {
 	}
 
 	@DeleteMapping("/user")
-//	public UserStatesDto removeUser(@RequestHeader(value = "Authorization") String authorization, 
-//			Principal principal) throws InterruptedException, ExecutionException {
-	public UserStatesDto removeUser(@RequestBody UserRemoveDto userRemoveDto) throws Exception {
-		return userAccountService.removeUser(userRemoveDto.getUserId());
+	public UserStatesDto removeUser(@RequestHeader(value = "Authorization") String authorization, 
+			Principal principal) throws UserNotFoundException, Exception {
+		return userAccountService.removeUser(principal.getName());
 	}
 
 	@PutMapping("/user")

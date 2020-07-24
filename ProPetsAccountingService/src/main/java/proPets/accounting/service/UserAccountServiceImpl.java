@@ -1,6 +1,5 @@
 package proPets.accounting.service;
 
-import java.util.List;
 import java.util.stream.Collectors;
 
 import org.mindrot.jbcrypt.BCrypt;
@@ -44,7 +43,7 @@ public class UserAccountServiceImpl implements UserAccountService {
 	AccountUtil accountUtil;
 
 	@Override
-	public ResponseEntity<UserStatesDto> register(NewUserDto newUserDto) throws Exception {
+	public ResponseEntity<UserStatesDto> register(NewUserDto newUserDto) throws Exception, InterruptedException {
 		if (accountRepository.existsById(newUserDto.getEmail())) {
 			throw new UserExistsException();
 		}
@@ -59,6 +58,7 @@ public class UserAccountServiceImpl implements UserAccountService {
 		accountRepository.save(userAccount);
 		String roles = accountUtil.convertSetOfRolesToString(userAccount.getRoles());
 		String newToken = jwtService.createAuthenticationToken(userAccount.getEmail(), roles);
+
 		HttpHeaders responseHeaders = new HttpHeaders();
 		responseHeaders.add("X-token", newToken);
 		return ResponseEntity.ok().headers(responseHeaders).body(accountUtil.userAccountToUserStatesDto(userAccount));
@@ -80,9 +80,7 @@ public class UserAccountServiceImpl implements UserAccountService {
 		accountUtil.removeUserDataInExternalService(email, dto, accountConfiguration.getMessagingCleanerUrl());
 		accountUtil.removeUserDataInExternalService(email, dto, accountConfiguration.getLostFoundCleanerUrl());
 		accountUtil.removeUserDataInExternalService(email, dto, accountConfiguration.getSearchingCleanerUrl());
-
 		return accountUtil.userAccountToUserStatesDto(userAccount);
-
 	}		
 	
 	@Override
@@ -102,7 +100,6 @@ public class UserAccountServiceImpl implements UserAccountService {
 		}
 		accountRepository.save(userAccount);
 		return accountUtil.userAccountToUserStatesDto(userAccount);
-
 	}
 
 	@Override
@@ -153,9 +150,8 @@ public class UserAccountServiceImpl implements UserAccountService {
 	@Override
 	public Iterable<UserStatesDto> getAllUsers(String email) {
 		UserAccount admin = accountRepository.findById(email).get();
-		List<UserAccount> list = accountRepository.findAll();
 		if (admin.getRoles().contains("ROLE_ADMIN")) {
-			return list.stream().map(u->accountUtil.userAccountToUserStatesDto(u)).collect(Collectors.toList());
+			return accountRepository.findAll().stream().map(u->accountUtil.userAccountToUserStatesDto(u)).collect(Collectors.toList());
 		} else
 			throw new ForbiddenException();
 	}

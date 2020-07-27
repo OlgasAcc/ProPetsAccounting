@@ -40,7 +40,4 @@ public class CORSFilter implements Filter {
 		chain.doFilter(request, response);
 	}
 
-	@Override
-	public void destroy() {
-	}
 }

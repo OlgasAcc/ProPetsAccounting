@@ -16,7 +16,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import proPets.accounting.configuration.AccountConfiguration;
-import proPets.accounting.dao.UserAccountRepository;
 import proPets.accounting.dto.UserRemoveDto;
 import proPets.accounting.dto.UserStatesDto;
 import proPets.accounting.model.UserAccount;
@@ -24,9 +23,6 @@ import proPets.accounting.model.UserAccount;
 @Component
 
 public class AccountUtil implements Serializable {
-
-	@Autowired
-	UserAccountRepository accountRepository;
 	
 	@Autowired
 	AccountConfiguration accConfiguration;
@@ -54,11 +50,5 @@ public class AccountUtil implements Serializable {
 		String res = String.join(",", userRoles);
 		return res;
 	}
-
-//	@Override
-//	public Boolean checkName(String name) {
-//		List<UserAccount> list = accountRepository.findByName(name).collect(Collectors.toList());
-//		return list.isEmpty();
-//	}
 
 }

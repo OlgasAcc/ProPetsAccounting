@@ -55,28 +55,26 @@ public class UserAccountController {
 	}
 
 	@PostMapping("/sign_in")
-	public UserStatesDto login(@RequestHeader(value = "Authorization") String authorization, Principal principal)
+	public UserStatesDto login(Principal principal)
 			throws Exception {
 		UserStatesDto user = userAccountService.findUser(principal.getName());
 		return user;
 	}
 
 	@GetMapping("/user/refresh_page")
-	public UserStatesDto refreshPage(@RequestHeader(value = "Authorization") String authorization, Principal principal)
+	public UserStatesDto refreshPage(Principal principal)
 			throws Exception {
 		UserStatesDto user = userAccountService.findUser(principal.getName());
 		return user;
 	}
 
 	@DeleteMapping("/user")
-	public UserStatesDto removeUser(@RequestHeader(value = "Authorization") String authorization, 
-			Principal principal) throws UserNotFoundException, Exception {
+	public UserStatesDto removeUser(Principal principal) throws UserNotFoundException, Exception {
 		return userAccountService.removeUser(principal.getName());
 	}
 
 	@PutMapping("/user")
-	public UserStatesDto editUser(@RequestHeader(value = "Authorization") String authorization,
-			@RequestBody UserEditDto userEditDto, Principal principal) {
+	public UserStatesDto editUser(@RequestBody UserEditDto userEditDto, Principal principal) {
 		return userAccountService.editUser(userEditDto, principal.getName());
 	}
 
@@ -87,14 +85,12 @@ public class UserAccountController {
 	}
 
 	@PostMapping("/user/role/{id}/{role}")
-	public void addRole(@RequestHeader(value = "Authorization") String authorization, @PathVariable String id,
-			@PathVariable String role, Principal principal) {
+	public void addRole(@PathVariable String id, @PathVariable String role, Principal principal) {
 		userAccountService.addRole(id, role, principal.getName());
 	}
 
 	@DeleteMapping("/user/role/{id}/{role}")
-	public void removeRole(@RequestHeader(value = "Authorization") String authorization, @PathVariable String id,
-			@PathVariable String role, Principal principal) {
+	public void removeRole(@PathVariable String id, @PathVariable String role, Principal principal) {
 		userAccountService.removeRole(id, role, principal.getName());
 	}
 
@@ -104,15 +100,12 @@ public class UserAccountController {
 	}
 
 	@GetMapping("/user/users")
-	public Iterable<UserStatesDto> getAllUsers(@RequestHeader(value = "Authorization") String authorization,
-			Principal principal) {
+	public Iterable<UserStatesDto> getAllUsers(Principal principal) {
 		return userAccountService.getAllUsers(principal.getName());
 	}
 
 	@PutMapping("/user/{id}")
-	public void blockOrUnblockUser(@RequestHeader(value = "Authorization") String authorization,
-			@PathVariable String id, Principal principal) {
+	public void blockOrUnblockUser(@PathVariable String id, Principal principal) {
 		userAccountService.blockOrUnblockUser(id, principal.getName());
 	}
-
 }

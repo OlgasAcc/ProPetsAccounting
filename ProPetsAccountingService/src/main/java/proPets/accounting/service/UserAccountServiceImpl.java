@@ -77,6 +77,7 @@ public class UserAccountServiceImpl implements UserAccountService {
 		accountRepository.deleteById(email);
 		UserRemoveDto dto = new UserRemoveDto(email);
 
+		// async methods
 		accountUtil.removeUserDataInExternalService(email, dto, accountConfiguration.getMessagingCleanerUrl());
 		accountUtil.removeUserDataInExternalService(email, dto, accountConfiguration.getLostFoundCleanerUrl());
 		accountUtil.removeUserDataInExternalService(email, dto, accountConfiguration.getSearchingCleanerUrl());

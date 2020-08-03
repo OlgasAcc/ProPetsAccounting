@@ -57,7 +57,7 @@ public class JWTAuthLoginFilter implements Filter {
 				return;
 			}
 			
-			UserAccount userAccount = accountRepository.findById(userCredentials.getLogin()).orElse(null);
+			UserAccount userAccount = accountRepository.findById(userCredentials.getLogin()).get();
 			tokenValidation (userAccount, userCredentials, response);
 			
 			String roles = convertSetOfRolesToString(userAccount.getRoles());

@@ -1,5 +1,6 @@
 package proPets.accounting.service;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import org.mindrot.jbcrypt.BCrypt;
@@ -76,13 +77,20 @@ public class UserAccountServiceImpl implements UserAccountService {
 		UserAccount userAccount = accountRepository.findById(email).orElseThrow(()->new UserNotFoundException());
 		accountRepository.deleteById(email);
 		UserRemoveDto dto = new UserRemoveDto(email);
-
+		
+		CompletableFuture<Boolean> result = accountUtil.removeUserDataInExternalService(dto, accountConfiguration.getMessagingCleanerUrl())
+		       .thenCompose(p -> accountUtil.removeUserDataInExternalService(dto, accountConfiguration.getLostFoundCleanerUrl()))
+		       .thenComposeAsync(p -> accountUtil.removeUserDataInExternalService(dto, accountConfiguration.getSearchingCleanerUrl()));		
+		result.get();
+		
 		// async methods
-		accountUtil.removeUserDataInExternalService(email, dto, accountConfiguration.getMessagingCleanerUrl());
-		accountUtil.removeUserDataInExternalService(email, dto, accountConfiguration.getLostFoundCleanerUrl());
-		accountUtil.removeUserDataInExternalService(email, dto, accountConfiguration.getSearchingCleanerUrl());
-		return accountUtil.userAccountToUserStatesDto(userAccount);
-	}		
+
+		//accountUtil.removeUserDataInExternalService(dto, accountConfiguration.getLostFoundCleanerUrl());
+		//accountUtil.removeUserDataInExternalService(dto, accountConfiguration.getMessagingCleanerUrl());
+		//if (res1&&res2&&res3) {
+		return accountUtil.userAccountToUserStatesDto(userAccount);}
+		//else throw new Exception("removing from external databases failed");
+	//}		
 	
 	@Override
 	public UserStatesDto editUser(UserEditDto userEditDto, String email) {

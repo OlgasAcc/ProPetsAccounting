@@ -1,11 +1,11 @@
 package proPets.accounting.service.utils;
 
-import java.io.Serializable;
 import java.net.URI;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.RequestEntity;
@@ -22,17 +22,17 @@ import proPets.accounting.model.UserAccount;
 
 @Component
 
-public class AccountUtil implements Serializable {
+public class AccountUtil {
 	
 	@Autowired
 	AccountConfiguration accConfiguration;
-
-	private static final long serialVersionUID = -2550185165626007488L;
 	
 	@Async("processExecutor")
-	public CompletableFuture<Boolean> removeUserDataInExternalService(String email, UserRemoveDto userRemoveDto,String url)  {
+	public CompletableFuture<Boolean> removeUserDataInExternalService(UserRemoveDto userRemoveDto,String url)  {
 		RestTemplate restTemplate = accConfiguration.restTemplate();
-		BodyBuilder requestBodyBuilder = RequestEntity.method(HttpMethod.DELETE, URI.create(url));
+		HttpHeaders newHeaders = new HttpHeaders();
+		newHeaders.add("Content-Type", "application/json");
+		BodyBuilder requestBodyBuilder = RequestEntity.method(HttpMethod.DELETE, URI.create(url)).headers(newHeaders);
 		RequestEntity<UserRemoveDto> request = requestBodyBuilder.body(userRemoveDto);
 		ResponseEntity<String> newResponse = restTemplate.exchange(request, String.class);
 		return CompletableFuture.completedFuture(newResponse.getStatusCode() == HttpStatus.OK);

@@ -1,21 +1,18 @@
 package proPets.accounting.configuration;
 
 import java.util.Base64;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.annotation.Configuration;
 
 import proPets.accounting.exceptions.UserAuthenticationException;
-import proPets.accounting.model.UserAccount;
 
 @Configuration
 @RefreshScope
 public class JWTConfiguration {
 
-	Map<String, UserAccount> authenticatedUsers = new ConcurrentHashMap<>();
+	//Map<String, UserAccount> authenticatedUsers = new ConcurrentHashMap<>();
 
 	//test
 	@Value("${jwt.message}")

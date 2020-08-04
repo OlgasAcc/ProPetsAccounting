@@ -65,7 +65,6 @@ public class UserAccountServiceImpl implements UserAccountService {
 		return ResponseEntity.ok().headers(responseHeaders).body(accountUtil.userAccountToUserStatesDto(userAccount));
 	}
 
-
 	@Override
 	public UserStatesDto findUser(String email) throws Exception {
 		UserAccount userAccount = accountRepository.findById(email).get();
@@ -81,16 +80,9 @@ public class UserAccountServiceImpl implements UserAccountService {
 		CompletableFuture<Boolean> result = accountUtil.removeUserDataInExternalService(dto, accountConfiguration.getMessagingCleanerUrl())
 		       .thenCompose(p -> accountUtil.removeUserDataInExternalService(dto, accountConfiguration.getLostFoundCleanerUrl()))
 		       .thenComposeAsync(p -> accountUtil.removeUserDataInExternalService(dto, accountConfiguration.getSearchingCleanerUrl()));		
-		result.get();
-		
-		// async methods
-
-		//accountUtil.removeUserDataInExternalService(dto, accountConfiguration.getLostFoundCleanerUrl());
-		//accountUtil.removeUserDataInExternalService(dto, accountConfiguration.getMessagingCleanerUrl());
-		//if (res1&&res2&&res3) {
-		return accountUtil.userAccountToUserStatesDto(userAccount);}
-		//else throw new Exception("removing from external databases failed");
-	//}		
+		result.get();		
+		return accountUtil.userAccountToUserStatesDto(userAccount);
+		}	
 	
 	@Override
 	public UserStatesDto editUser(UserEditDto userEditDto, String email) {

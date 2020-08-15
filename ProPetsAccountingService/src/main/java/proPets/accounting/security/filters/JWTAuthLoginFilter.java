@@ -65,6 +65,7 @@ public class JWTAuthLoginFilter implements Filter {
 			try {
 				newToken = jwtService.createAuthenticationToken(userAccount.getEmail(), roles);
 				response.setHeader("X-token", newToken);
+				System.out.println("added x-token");
 
 			} catch (Exception e) {
 				response.sendError(404, "Token creation failed");

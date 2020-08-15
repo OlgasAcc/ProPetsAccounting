@@ -22,7 +22,6 @@ public class AuthenticationController {
 	@Autowired
 	JwtServiceImpl jwtUserDetailsServiceImpl;
 
-// for all microservices besides accounting!
 
 	@RequestMapping(value = "/verify", method = RequestMethod.POST)
 	public ResponseEntity<AuthResponse> tokenValidation(@RequestHeader(value = "Authorization") String token)

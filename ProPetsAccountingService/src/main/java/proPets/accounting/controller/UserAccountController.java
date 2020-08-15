@@ -26,7 +26,7 @@ import proPets.accounting.dto.UserStatesDto;
 import proPets.accounting.exceptions.UserNotFoundException;
 import proPets.accounting.service.UserAccountService;
 
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "http://localhost:3000", exposedHeaders = "X-token")
 @RestController
 @RequestMapping("/account/v1")
 public class UserAccountController {
